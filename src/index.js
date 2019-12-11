@@ -1,12 +1,30 @@
+/*
+ * @Author: your name
+ * @Date: 2019-12-10 16:51:56
+ * @LastEditTime: 2019-12-10 18:23:28
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /share-bike-ms/src/index.js
+ */
+// 入口文件
+
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import App from './App';
-import * as serviceWorker from './serviceWorker';
+import './reset.css';
+import Login from './pages/login/Login';
+import Admin from './pages/admin/Admin';
+// import 'antd/dist/antd.css';
 
-ReactDOM.render(<App />, document.getElementById('root'));
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+ReactDOM.render(
+    <BrowserRouter>
+        <Switch>
+            <Route path='/login' component={Login}></Route>
+            <Route path='/' component={Admin}></Route>
+        </Switch>
+    </BrowserRouter>
+,document.getElementById('root'));
+
+
