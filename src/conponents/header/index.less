@@ -1,0 +1,43 @@
+.my-header{
+    color: #333;
+    line-height: 40px;
+    text-align: right;
+    .top-header{
+        height: 40px;
+        padding-right: 30px;
+        border-bottom: 1px solid green;
+
+        span{
+            margin-right: 15px;
+        }
+    }
+
+    .bottom-header{
+        height: 40px;
+        display: flex;
+        justify-content:space-between ;
+
+        .bottom-header-left{
+            width: 25%;
+            text-align: center;
+            position: relative;
+
+            &::after{
+                content: '';
+                position: absolute;
+                right: 50%;
+                transform: translateX(50%);
+                top: 90%;
+                border:15px solid transparent;
+                border-top-color:#fff ;
+                border-radius: 5px;
+
+            }
+        }
+
+        .bottom-header-right{
+            width: 75%;
+            padding-right: 30px;
+        }
+    }
+}

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2019-12-10 16:51:56
- * @LastEditTime: 2019-12-10 18:23:28
+ * @LastEditTime: 2019-12-12 10:56:32
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /share-bike-ms/src/index.js
@@ -10,21 +10,16 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {BrowserRouter, Route, Switch} from 'react-router-dom';
+import storeUtils from './utils/storeUtils';
+import memoryUtils from './utils/memoryUtils';
 import App from './App';
-import './reset.css';
-import Login from './pages/login/Login';
-import Admin from './pages/admin/Admin';
 // import 'antd/dist/antd.css';
 
-
+const user=storeUtils.getUser();
+memoryUtils.user=user;
+console.log(memoryUtils.user)
 ReactDOM.render(
-    <BrowserRouter>
-        <Switch>
-            <Route path='/login' component={Login}></Route>
-            <Route path='/' component={Admin}></Route>
-        </Switch>
-    </BrowserRouter>
+<App/>
 ,document.getElementById('root'));
 
 
