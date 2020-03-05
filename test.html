@@ -1,0 +1,255 @@
+<!--
+ * @Author: your name
+ * @Date: 2019-12-18 17:06:45
+ * @LastEditTime: 2020-02-27 17:55:15
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /share-bike-ms/test.html
+ -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        {{ message }}
+
+        <input type="text" v-model = 'message'>
+
+        <p v-bind:title="date">
+            鼠标悬停几秒钟查看此处动态绑定的提示信息！
+        </p>
+
+        <div v-if= 'isShow'>
+            can you see me ?
+        </div>
+
+        <ul>
+            <li v-for = '(todo, index) in todos' :key='index'
+                v-on:click = 'shiftTodo'
+            >
+                {{index+' : '+todo.text}}
+            </li>
+        </ul>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        var app = new Vue({
+            el:'#app',
+            data:{
+                message:'hello world',
+                date:'页面加载于' + (new Date).getFullYear(),
+                isShow:false,
+                todos: [
+                    { text: '学习 JavaScript' },
+                    { text: '学习 Vue' },
+                    { text: '整个牛项目' }
+                    ],
+            },
+            methods:{
+                shiftTodo:function (){
+                    this.todos.shift();
+                }
+            }
+        })
+    </script>
+
+
+<!-- 
+    <script>
+//'use strict';
+
+var ListRender = function () {
+    var $List = $('.travel-list'),
+        //http = 'http://198.218.4.179:7480/',
+        http =$("#imgurl").val(), //图片前需要拼接的地址
+        channelType='web',//类型
+        isLoading = false,//是否是正在加载中
+        
+        hasMore = true, //是否有更多数据
+        showUrl=rootUrl+'api/showBack',//爆光回调地址    
+        stationTelecode=$("#stationTelecode").val(),//车站码
+        pageNumber = 0, //页码     
+        pageSize = 5; //参数每次请求数据的条数
+        
+        //url=rootUrl+'/api/dataList?pageNumber=' + pageNumber + '&pageSize=' + pageSize,//获取数据接口
+
+    
+    //=>获取数据
+    var queryData = function queryData() {
+    	var url="";
+        //没pageNumber   
+    	if (!hasMore) return;
+   
+        //=>记录是否正在加载中，加载中不在进行任何其余操作
+        if (isLoading) return;
+        isLoading = true;
+        pageNumber++;
+       // alert(stationTelecode!=""&&stationTelecode!=undefined);
+        if(stationTelecode!=""&&stationTelecode!=undefined){
+        	url=rootUrl+'api/dataList?pageNumber=' + pageNumber + '&pageSize=' + pageSize+'&toStation='+stationTelecode;
+        }else{
+        	url=rootUrl+'api/dataList?pageNumber=' + pageNumber + '&pageSize=' + pageSize;
+        }
+        $.ajax({
+        	//url:rootUrl+'api/dataList?pageNumber=' + pageNumber + '&pageSize=' + pageSize+'&stationTelecode='+stationTelecode,
+        	url:url,
+            method: 'get',
+            dataType: 'json',
+            success: itemHTML,
+        });
+    };
+
+
+    var itemHTML = function itemHTML(result) {
+    	 //data=null时，请求错误，系统异常
+        if(!result.data){
+            window.location.href=rootUrl+'error.html';
+            return;
+        }
+    	
+        //total字段为0时，没有数据
+        if (result.data.total == 0) {
+        	 $(".loading").css("display","none");
+             $(".mask").css("display","none");
+            $List.html("<div class='no-resource'><p>暂时没有数据</p></div>");
+            return;
+        }
+        var _result$data = result.data,
+            total = _result$data.total,
+            data = _result$data.rows,
+            clickUrl = result.clickUrl;
+
+        var str = '';
+        var trInfoIds = '';
+        for (var i = 0; i < data.length; i++) {
+            var item = data[i];
+            var trInfoId = item.trInfoId,
+                firstTitle = item.firstTitle,
+                secondTitle = item.secondTitle,
+                infoType = item.infoType,
+               // trColumn = getColumnName(item.trColumn),
+                trColumn=item.ext3||'',//栏目名
+                ext1 = item.ext1&&item.ext1.split(','),//资讯所有图片
+                ext2=item.ext2,//栏目图标
+                turnType = item.turnType,
+                turnUrl = item.turnUrl;
+            trInfoIds += trInfoId + ',';
+          
+            //迭代所有的数据依次增加到页面中
+            if (infoType === 3) {
+                str += '<a class="tranel-list-item tranel-list-card" href="javascript:;" id="' + trInfoId + '" turnType="' + turnType + '" turnUrl="' + turnUrl + '"><div class="list-pic" ><img class="lazy" src="../static/images/placeholder.png" data-original="' + http + ext1[0] + '" alt=""></div><div class="list-con">  <div class="list-author">    <img class="lazy author-head" src="../static/images/placeholder.png" data-original="' + http + ext2 + '" alt="">    <div class="author-name">' + trColumn + '</div>  </div>  <div class="list-name">' + firstTitle + '</div>  <div class="list-txt">' + secondTitle + '</div></div> </a>';
+            } else if (infoType === 1) {
+                str += ' <a class="tranel-list-item tranel-list-pic-info" href="javascript:;" id="' + trInfoId + '" turnType="' + turnType + '"  turnUrl="' + turnUrl + '"><div class="list-pic"><img class="lazy" src="../static/images/placeholder.png" data-original="' + http + ext1[0] + '" alt=""></div><div class="list-info">  <div class="list-name">' + firstTitle + '</div>  <div class="list-txt">' + secondTitle + '</div></div></a>';
+            } else if (infoType === 2) {
+                str += '  <a class="tranel-list-item tranel-list-pic" href="javascript:;" id="' + trInfoId + '" turnType="' + turnType + '" turnUrl="' + turnUrl + '">        <div class="list-name">' + firstTitle + '</div>        <ul class="list-pic">        <li><img class="lazy" src="../static/images/placeholder.png" data-original="' + http + ext1[0] + '" alt=""></li>        <li><img class="lazy" src="../static/images/placeholder.png" data-original="' + http + ext1[1] + '" alt=""></li>        <li><img class="lazy" src="../static/images/placeholder.png" data-original="' + http + ext1[2] + '" alt=""></li>        </ul>        </a>  ';
+            } else {
+                str += '<a class="tranel-list-item tranel-list-txt" href="javascript:;" id="' + trInfoId + '" turnType="' + turnType + '" turnUrl="' + turnUrl + '" ><div class="list-name">' + firstTitle + '</div><div class="list-txt">' + secondTitle + '</div></a>';
+            }
+        }
+        //首页加载图标样式移除
+        $(".loading").css("display","none");
+        $(".mask").css("display","none");
+        $List[0].innerHTML += str;
+        //资源加载完成触发事件
+        trInfoIds=trInfoIds.slice(0,trInfoIds.length-1);
+        $.post(showUrl, {infoIds: trInfoIds,channelType:'web'});
+
+        isLoading = false;
+        pageNumber * pageSize >= total ? hasMore = false : hasMore = true;
+        hasMore ? ($('.has-more').css('display', 'block') && $('.no-more').css('display', 'none')) : ($('.no-more').css('display', 'block') && $('.has-more').css('display', 'none'));
+        var aImages = $('.lazy');
+        imgLazy(aImages);
+    };
+       //图片加载失败
+       $('img').error(function () {
+           $('img').addClass('error');
+           this.src = "../static/images/placeholder.png";
+        
+       })
+
+    
+    
+  //点击跳转并传参数
+    $List.on('click', function (e) {
+        var target = e.target;
+        var id = target.id || (target.offsetParent.id||target.offsetParent.offsetParent.id);
+        var turnType = target.getAttribute('turnType') || target.offsetParent.getAttribute('turnType');
+        var turnUrl = target.getAttribute('turnUrl') || target.offsetParent.getAttribute('turnUrl');
+        var url="";
+     //缓存
+     
+        sessionStorage.setItem('index_list',$List.html());//存储列表数据
+        sessionStorage.setItem('index_page',pageNumber);//存储页码
+        sessionStorage.setItem('index_scroll',$('.content').scrollTop());//存储滚动条位置
+        sessionStorage.setItem('index_more',hasMore);//存储滚动条位置
+        //点击跳转链接判断
+        //var url = turnType == 2 ? turnUrl : 'info.html?trInfoId=' + id;
+       // var url = turnType == 2 ? turnUrl :rootUrl+'/api/info?trInfoId=' + id+"&toStation="+$("#stationTelecode").val();
+        if($("#stationTelecode").val()!=""&&$("#stationTelecode").val()!=undefined){
+        	 var url = turnType == 2 ? turnUrl :rootUrl+'api/info?trInfoId=' + id+"&channelType="+channelType+"&toStation="+$("#stationTelecode").val();
+        }else{
+        	 var url = turnType == 2 ? turnUrl :rootUrl+'api/info?trInfoId=' + id+"&channelType="+channelType;
+        }
+       
+    // var url = turnType == 2 ? turnUrl :rootUrl+'api/info?trInfoId=' +"&channelType="+channelType;
+       window.location.href = url;
+    });
+
+
+  //=>滚动加载更多
+    var loadMore = function loadMore() { 
+        $('.content').scroll(function () {
+        	 var winH = $(window).height();
+           /*  var pageH = $(document).height();*/
+             var pageH = $('.travel-list').height();
+             var scrollT = $('.content').scrollTop();       
+            if (scrollT + winH+100 >= pageH) {  	 
+                queryData();
+            }
+        })
+    };
+    
+    return {
+        init: function init() {        	
+        	var list = sessionStorage.getItem('index_list');
+        	if(list){
+        		 //首页加载图标样式移除
+                $(".loading").css("display","none");
+                $(".mask").css("display","none");
+        		 //恢复数据
+                $List.html(list);
+               // imgLazy();
+                pageNumber = sessionStorage.getItem('index_page');
+    	        hasMore=JSON.parse(sessionStorage.getItem('index_more'));
+                window.onload = function () {	   	        	           
+	        	            $('.content').scrollTop(sessionStorage.getItem('index_scroll'));        	          
+        	            hasMore ? ($('.has-more').css('display', 'block') && $('.no-more').css('display', 'none')) : ($('.no-more').css('display', 'block') && $('.has-more').css('display', 'none')); 	              
+        	            //删除缓存
+        	            sessionStorage.clear();      	     
+        	    };
+        	}else{
+        		queryData();    		
+        	}   		
+        	$(function(){
+        		FastClick.attach(document.body); 
+        	}) 
+             //=>滚动到底部加载更多
+           /* $(window).on('scroll',loadMore);*/
+        	 $('.content').on('scroll',loadMore);
+        }
+    };
+}();
+ListRender.init();
+
+</script> -->
+
+</body>
+
+</html>

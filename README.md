@@ -1,7 +1,15 @@
+<!--
+ * @Author: your name
+ * @Date: 2019-12-10 10:54:36
+ * @LastEditTime: 2020-03-04 10:23:30
+ * @LastEditors: your name
+ * @Description: In User Settings Edit
+ * @FilePath: /react-fp-admin/README.md
+ -->
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
-
+"proxy": "http://192.168.6.118:2224/service",
 In the project directory, you can run:
 
 ### `yarn start`

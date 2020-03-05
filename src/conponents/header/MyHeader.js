@@ -1,43 +1,101 @@
-/*
- * @Author: your name
- * @Date: 2019-12-12 14:25:12
- * @LastEditTime: 2019-12-16 10:51:09
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: /share-bike-ms/src/conponents/header/MyHeader.js
- */
 
 import React, { Component } from 'react'
-import { Modal } from 'antd';
+import { Modal,Avatar,Icon,Dropdown,Menu,Upload } from 'antd';
 import {withRouter} from 'react-router-dom'
-// import PubSub from 'pubsub-js' 
-import {reqWeather} from '../../api'
+// import PubSub from 'pubsub-js'
 import memoryUtils from '../../utils/memoryUtils'
 import storeUtils from '../../utils/storeUtils'
-import {dateFormat} from '../../utils/dateUtils'
- import menuList from '../../config/menuConfig'
 import LinkButton from '../link-button/index'
 import './index.less'
 
 const { confirm } = Modal;
-
+const { Item } = Menu
 class MyHeader extends Component {
-    state={
-        currentTime:dateFormat(new Date()),
-    }
 
-    getWheather=(city)=>{
+    state = {
+        collapsed: false,
+        isFullScreen: false,
+        previewVisible: false,
+        previewImage: '',
+        file:{},
+        avatar:'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png'
+    };
 
-        reqWeather(city).then(res=>{
-            if(res.err_code==='0'){
-                const {weather}=res.weather;
-                return weather;
-            }
-            return '晴天'          
+        
+    fullScreen = () => {
+        if (!this.state.isFullScreen) {
+            this.requestFullScreen();
+        } else {
+            this.exitFullscreen();
+        }
+    };
+    
+    //进入全屏
+    requestFullScreen = () => {
+        var de = document.documentElement;
+        if (de.requestFullscreen) {
+        de.requestFullscreen();
+        } else if (de.mozRequestFullScreen) {
+        de.mozRequestFullScreen();
+        } else if (de.webkitRequestFullScreen) {
+        de.webkitRequestFullScreen();
+        }
+    };
+    
+    //退出全屏
+    exitFullscreen = () => {
+        let de = document;
+        if (de.exitFullscreen) {
+        de.exitFullscreen();
+        } else if (de.mozCancelFullScreen) {
+        de.mozCancelFullScreen();
+        } else if (de.webkitCancelFullScreen) {
+        de.webkitCancelFullScreen();
+        }
+    };
+    
+    //监听fullscreenchange事件
+    watchFullScreen = () => {
+        const _self = this;
+        
+        document.addEventListener(
+            "fullscreenchange",
+            function() {
+                _self.setState({
+                    isFullScreen: document.fullscreen
+                });
+                },
+            false
+        );
+        document.addEventListener(
+        "webkitfullscreenchange",
+        function() {
+            _self.setState({
+                isFullScreen: document.webkitIsFullScreen
+            });
+        },
+        false
+        );
+        document.addEventListener(
+            "mozfullscreenchange",
+            function() {
+                _self.setState({
+                    isFullScreen: document.mozFullScreen
+                });
+            },
+            false
+        );
+    };
+    
+    
+    toggle = () => {
+        this.setState({
+            collapsed: !this.state.collapsed,
         });
-    }
+    };
 
-    handleClick=()=>{
+
+    exit=()=>{
         confirm({
             // title: 'Do you Want to exit?',
             content: 'Do you Want to exit',
@@ -47,39 +105,62 @@ class MyHeader extends Component {
                 this.props.history.replace("/login");
             },
             });
-   
     }
 
-    getCurrentTime=()=>{
-        this.timer=setInterval(()=>{
-            let currentTime=dateFormat(new Date());
-            this.setState({
-                currentTime
-            })
-            // clearInterval(this.timer)
-        },1000)
+    // getMenuItem=(menu,pathname)=>{
+    //     let menuItem;
+    //     menu.forEach((item)=>{
+    //         console.log(item)
+    //         if(!item.children){
+    //             if(item.key===pathname) {
+    //                 console.log(item)
+    //                 menuItem=item
+    //             }
+    //         }else{
+    //             // this.getMenuItem(item.children,pathname)
+    //             menuItem=item.children.find(item=>item.key===pathname)
+    //         }
+    //     })  
+    //     return menuItem
+    // }
+
+
+    getBase64 = (file)=>{
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
     }
 
-    getMenuItem=(menu,pathname)=>{
-        let menuItem;
-        menu.forEach((item)=>{
-            console.log(item)
-            if(!item.children){
-                if(item.key===pathname) {
-                    console.log(item)
-                    menuItem=item
-                }
-            }else{
-                // this.getMenuItem(item.children,pathname)
-                menuItem=item.children.find(item=>item.key===pathname)
-            }
-        })  
-        return menuItem
+    handleCancel = () => this.setState({ previewVisible: false });
+
+    // handlePreview = async file => {
+    //     if (!file.url && !file.preview) {
+    //     file.preview = await this.getBase64(file.originFileObj);
+    //     }
+
+    //     this.setState({
+    //     previewImage: file.url || file.preview,
+    //     previewVisible: true,
+    //     });
+    // };
+
+
+    handleChange = ({ file, fileList }) => {
+
+        if(file.status === 'done') {
+            console.log(file,'file',fileList);
+            
+        } else if (file.status === 'removed'){
+            console.log('delette');
+            
+        }
     }
-    
-    componentDidMount(){        
-        const weather = this.getWheather({city:"北京"});      
-        this.getCurrentTime();     
+
+    componentDidMount = () => {
+        this.watchFullScreen()
     }
 
     componentWillUnmount(){
@@ -89,26 +170,47 @@ class MyHeader extends Component {
     render() {
         
         const {username}=memoryUtils.user
-        const {pathname}=this.props.location; 
-        // const menuItem=this.getMenuItem(menuList,pathname);
-        // console.log(menuItem);
-        // // if(this.state.path!==pathname){           
-        //     const menuItem=this.getMenuItem(menuList,pathname);
-        //     console.log(menuItem)
-        // }           
+        const {pathname}=this.props.location;
+        
+        const menu = (
+            <Menu>
+                <Menu.ItemGroup key="g1" title="用户中心">
+                    <Item key="1">你好,{username}</Item>
+                    <Item key="2">个人信息</Item>
+                    <Item key="avatar">
+                        <Upload 
+                            listType="picture"
+                            onChange={this.handleChange}
+                        >
+                            {/* <LinkButton> */}
+                                更换头像
+                            {/* </LinkButton> */}
+                        </Upload>
+                    </Item>
+                    <Item key="exit" onClick={this.exit}>退出登陆</Item>
+                </Menu.ItemGroup>
+            
+                <Menu.ItemGroup key="设置" title="设置中心">
+                    <Item key="1">个人设置</Item>
+                </Menu.ItemGroup>
+            </Menu>
+        );
         return (
             <div className="my-header">
-                <div className="top-header">
-                <span>欢迎，{username}</span>
-                <LinkButton onClick={this.handleClick}>退出</LinkButton>
+            {/* <Icon
+                        className="trigger"
+                        type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
+                        onClick={this.toggle}
+                    /> */}
+                <div>
+                
                 </div>
-
-                <div className="bottom-header">
-                <div className="bottom-header-left">shouye</div>
-                    <div className="bottom-header-right">
-                    <span>{this.state.currentTime}</span>
-                        <span>☀️ 晴天</span>
-                    </div>
+                <div className="top-header">
+                <Icon type="arrows-alt"  hidden={this.state.isFullScreen} onClick={this.fullScreen}/>
+                <Icon type="shrink" hidden={!this.state.isFullScreen} onClick={this.fullScreen}/>
+                <Dropdown overlay={menu} placement="bottomRight">
+                    <Avatar src={this.state.avatar} />
+                </Dropdown>
                 </div>
             </div>
         )

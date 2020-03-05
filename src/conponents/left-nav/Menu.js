@@ -1,29 +1,20 @@
 /*
  * @Author: your name
  * @Date: 2019-12-12 15:07:19
- * @LastEditTime: 2019-12-13 09:59:38
- * @LastEditors: Please set LastEditors
+ * @LastEditTime : 2020-01-06 16:14:52
+ * @LastEditors  : Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /share-bike-ms/src/conponents/left-nav/Menu.js
  */
-
 import React from 'react';
 import { Link,withRouter } from 'react-router-dom';
 import { Menu, Icon } from 'antd';
+
 import menuList from '../../config/menuConfig';
 
 const { SubMenu } = Menu;
 
-class LeftMenu extends React.Component {
-    state = {
-        collapsed: false,
-    };
-
-    toggleCollapsed = () => {
-        this.setState({
-        collapsed: !this.state.collapsed,
-        });
-    };
+class LeftMenu extends React.Component { 
 
     getMenuNodes=(menuList)=>{
         // defaultOpenKeys='';
@@ -63,22 +54,18 @@ class LeftMenu extends React.Component {
     componentWillMount(){
         this.menuNodes=this.getMenuNodes(menuList);
     }
-    // static getDerivedStateFromProps(){
-    //     this.menuNodes=this.getMenuNodes(menuList);
-    // }
-
-
+    
     render() {
         const selectKey=this.props.location.pathname;
         
         return (
             <div style={{ width:'100%' }}>
+                
                 <Menu
                     selectedKeys={[selectKey]}
                     defaultOpenKeys={[this.openKey]}
                     mode="inline"
                     theme="dark"
-                    inlineCollapsed={this.state.collapsed}
                 >
                     {
                         this.menuNodes

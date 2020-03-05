@@ -1,8 +1,8 @@
 /*
  * @Author: your name
  * @Date: 2019-12-10 17:22:53
- * @LastEditTime: 2019-12-10 17:56:44
- * @LastEditors: Please set LastEditors
+ * @LastEditTime : 2020-01-08 16:02:02
+ * @LastEditors  : Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /share-bike-ms/src/config-overrides.js
  */
@@ -19,6 +19,6 @@ module.exports = override(
     //修改源码中的less 文件
     addLessLoader({
         javascriptEnabled: true,
-        modifyVars: { '@primary-color': '#1DA57A' },
+        // modifyVars: { '@primary-color': '#3c8dbc' },
         }),
     );
